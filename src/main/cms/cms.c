@@ -238,7 +238,20 @@ static int cmsDrawMenuEntry(displayPort_t *pDisplay, OSD_Entry *p, uint8_t row)
     case OME_Submenu:
     case OME_Funcall:
         if (IS_PRINTVALUE(p))  {
-            cnt = displayWrite(pDisplay, RIGHT_MENU_COLUMN(pDisplay), row, ">");
+
+            int colPos = RIGHT_MENU_COLUMN(pDisplay);
+
+            if ((p->type == OME_Submenu) && p->func && (p->flags & OPTSTRING)) {
+
+                // Special case of sub menu entry with optional value display.
+
+                char *str = ((CMSMenuOptFuncPtr)p->func)();
+                cnt = displayWrite(pDisplay, colPos, row, str);
+                colPos += strlen(str);
+            }
+
+            cnt += displayWrite(pDisplay, colPos, row, ">");
+
             CLR_PRINTVALUE(p);
         }
         break;
@@ -252,7 +265,7 @@ static int cmsDrawMenuEntry(displayPort_t *pDisplay, OSD_Entry *p, uint8_t row)
             CLR_PRINTVALUE(p);
         }
         break;
-    case OME_TAB: {
+    case OME_TAB:
         if (IS_PRINTVALUE(p)) {
             OSD_TAB_t *ptr = p->data;
             //cnt = displayWrite(pDisplay, RIGHT_MENU_COLUMN(pDisplay) - 5, row, (char *)ptr->names[*ptr->val]);
@@ -260,7 +273,6 @@ static int cmsDrawMenuEntry(displayPort_t *pDisplay, OSD_Entry *p, uint8_t row)
             CLR_PRINTVALUE(p);
         }
         break;
-    }
 #ifdef OSD
     case OME_VISIBLE:
         if (IS_PRINTVALUE(p) && p->data) {
@@ -646,7 +658,20 @@ STATIC_UNIT_TESTED uint16_t cmsHandleKey(displayPort_t *pDisplay, uint8_t key)
 
     switch (p->type) {
         case OME_Submenu:
-        case OME_Funcall:
+            if (key == KEY_RIGHT) {
+                cmsMenuChange(pDisplay, p->data);
+                res = BUTTON_PAUSE;
+            }
+            break;
+        case OME_Funcall:;
+            long retval;
+            if (p->func && key == KEY_RIGHT) {
+                retval = p->func(pDisplay, p->data);
+                if (retval == MENU_CHAIN_BACK)
+                    cmsMenuBack(pDisplay);
+                res = BUTTON_PAUSE;
+            }
+            break;
         case OME_OSD_Exit:
             if (p->func && key == KEY_RIGHT) {
                 p->func(pDisplay, p->data);

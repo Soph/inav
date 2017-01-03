@@ -84,6 +84,7 @@
 #include "io/pwmdriver_i2c.h"
 #include "io/osd.h"
 #include "io/displayport_msp.h"
+#include "io/vtx_smartaudio.h"
 
 #include "msp/msp_serial.h"
 
@@ -613,6 +614,10 @@ void init(void)
     if (feature(FEATURE_PWM_SERVO_DRIVER)) {
         pwmDriverInitialize();
     }
+#endif
+
+#ifdef VTX_SMARTAUDIO
+    smartAudioInit();
 #endif
 
     // Latch active features AGAIN since some may be modified by init().

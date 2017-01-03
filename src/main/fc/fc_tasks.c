@@ -54,6 +54,7 @@
 #include "io/osd.h"
 #include "io/pwmdriver_i2c.h"
 #include "io/serial.h"
+#include "io/vtx_smartaudio.h"
 
 #include "msp/msp_serial.h"
 
@@ -252,6 +253,19 @@ void taskUpdateOsd(timeUs_t currentTimeUs)
 }
 #endif
 
+#ifdef VTX_CONTROL
+// Everything that listens to VTX devices
+void taskVtxControl(uint32_t currentTime)
+{
+    if (ARMING_FLAG(ARMED))
+        return;
+
+#ifdef VTX_SMARTAUDIO
+    smartAudioProcess(currentTime);
+#endif
+}
+#endif
+
 void fcTasksInit(void)
 {
     schedulerInit();
@@ -326,6 +340,11 @@ void fcTasksInit(void)
     setTaskEnabled(TASK_CMS, true);
 #else
     setTaskEnabled(TASK_CMS, feature(FEATURE_OSD) || feature(FEATURE_DASHBOARD));
+#endif
+#endif
+#ifdef VTX_CONTROL
+#ifdef VTX_SMARTAUDIO
+    setTaskEnabled(TASK_VTXCTRL, true);
 #endif
 #endif
 }
@@ -518,6 +537,15 @@ cfTask_t cfTasks[TASK_COUNT] = {
         .taskFunc = cmsHandler,
         .desiredPeriod = 1000000 / 60,          // 60 Hz
         .staticPriority = TASK_PRIORITY_LOW,
+    },
+#endif
+
+#ifdef VTX_CONTROL
+    [TASK_VTXCTRL] = {
+        .taskName = "VTXCTRL",
+        .taskFunc = taskVtxControl,
+        .desiredPeriod = TASK_PERIOD_HZ(5),          // 5Hz @200msec
+        .staticPriority = TASK_PRIORITY_IDLE,
     },
 #endif
 };
