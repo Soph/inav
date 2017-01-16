@@ -86,6 +86,7 @@
 #define MAX_BOOTLOG_ENTRIES     64
 #define VTX_CONTROL
 #define VTX_SMARTAUDIO
+#define VTX_TRAMP
 #else
 #define CLI_MINIMAL_VERBOSITY
 #define SKIP_TASK_STATISTICS
