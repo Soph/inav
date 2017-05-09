@@ -84,6 +84,7 @@
 #define PWM_DRIVER_PCA9685
 #define NAV_MAX_WAYPOINTS       60
 #define MAX_BOOTLOG_ENTRIES     64
+#define VTX_COMMON
 #define VTX_CONTROL
 #define VTX_SMARTAUDIO
 #define VTX_TRAMP

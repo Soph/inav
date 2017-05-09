@@ -576,6 +576,7 @@ HIGHEND_SRC = \
             drivers/display_ug2864hsweg01.c \
             drivers/sonar_hcsr04.c \
             drivers/sonar_srf10.c \
+            drivers/vtx_common.c \
             io/dashboard.c \
             io/displayport_max7456.c \
             io/displayport_msp.c \
@@ -605,9 +606,10 @@ HIGHEND_SRC = \
             telemetry/mavlink.c \
             telemetry/smartport.c \
             telemetry/telemetry.c \
-            io/vtx_common.c \
+            io/vtx_string.c \
             io/vtx_smartaudio.c \
-            io/vtx_tramp.c
+            io/vtx_tramp.c \
+            io/vtx_control.c
 
 ifeq ($(TARGET),$(filter $(TARGET),$(F4_TARGETS)))
 VCP_SRC = \
